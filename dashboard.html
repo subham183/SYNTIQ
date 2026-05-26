@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYNTIQ — Analytics Dashboard</title>
+{% load static %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/syntiq.css' %}">
+</head>
+<body class="dashboard-body">
+<div class="noise-overlay"></div>
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-text">SYNTIQ</span>
+      <span class="logo-bracket">]</span>
+      <span class="logo-tag">Dashboard</span>
+    </div>
+    <div class="nav-links">
+      <a href="{% url 'index' %}" class="nav-link">← Back to Analyzer</a>
+      <button class="nav-link nav-cta" onclick="refreshStats()">↺ Refresh</button>
+    </div>
+  </div>
+</nav>
+
+<div class="dash-header">
+  <div class="section-label">// AGGREGATED ANALYTICS</div>
+  <h2 class="dash-title">System Dashboard</h2>
+  <p class="dash-subtitle">Real-time aggregations computed directly in the database — AVG(), SUM(), string-diff metrics — returned as a single compiled row.</p>
+</div>
+
+<!-- KPI ROW -->
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="kpi-val" id="kpi-total">{{ stats.total_submissions }}</div>
+    <div class="kpi-label">Total Submissions</div>
+    <div class="kpi-sub">Dual-pipeline jobs processed</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val" id="kpi-complexity">{{ stats.avg_complexity }}</div>
+    <div class="kpi-label">Avg Complexity</div>
+    <div class="kpi-sub">McCabe score across all code</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val" id="kpi-chars">{{ stats.total_chars_modified }}</div>
+    <div class="kpi-label">Chars Modified</div>
+    <div class="kpi-sub">Total linguistic transformation</div>
+  </div>
+  <div class="kpi-card kpi-alert">
+    <div class="kpi-val" id="kpi-hazards">{{ stats.total_hazards_caught }}</div>
+    <div class="kpi-label">Hazards Caught</div>
+    <div class="kpi-sub">AST security flags raised</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val" id="kpi-fp">{{ stats.total_fingerprints }}</div>
+    <div class="kpi-label">AI Prints Removed</div>
+    <div class="kpi-sub">Fingerprint sanitizations</div>
+  </div>
+</div>
+
+<!-- GRADE DIST + RECENT TABLE -->
+<div class="dash-grid">
+  <div class="dash-card">
+    <div class="dash-card-header">Grade Distribution</div>
+    <div class="grade-bars" id="grade-bars">
+      {% for grade, count in stats.grade_dist.items %}
+      <div class="grade-row">
+        <span class="grade-label grade-{{ grade }}">{{ grade }}</span>
+        <div class="grade-bar-wrap">
+          <div class="grade-bar" style="width: {{ count|floatformat:0 }}0%"></div>
+        </div>
+        <span class="grade-count">{{ count }}</span>
+      </div>
+      {% empty %}
+      <div class="empty-state">No submissions yet. Run the dual pipeline to see grades.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="dash-card dash-card-wide">
+    <div class="dash-card-header">Recent Submissions</div>
+    <table class="dash-table" id="recent-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Time</th>
+          <th>LOC</th>
+          <th>Complexity</th>
+          <th>Grade</th>
+          <th>Hazards</th>
+          <th>Chars Δ</th>
+          <th>Fingerprints</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in stats.recent %}
+        <tr>
+          <td><span class="entry-id">{{ entry.id }}</span></td>
+          <td class="entry-time">{{ entry.timestamp|slice:":19" }}</td>
+          <td>{{ entry.code_loc }}</td>
+          <td>{{ entry.complexity }}</td>
+          <td><span class="grade-badge grade-{{ entry.grade }}">{{ entry.grade }}</span></td>
+          <td class="{% if entry.hazard_count > 0 %}hazard-count{% endif %}">{{ entry.hazard_count }}</td>
+          <td>{{ entry.chars_modified }}</td>
+          <td>{{ entry.fingerprints }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="empty-state">No submissions recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SYSTEM STATUS -->
+<div class="system-status">
+  <div class="section-label">// SYSTEM STATUS</div>
+  <div class="status-grid">
+    <div class="status-item online">
+      <span class="status-dot"></span>
+      <span class="status-name">Django Server</span>
+      <span class="status-val">Online</span>
+    </div>
+    <div class="status-item online">
+      <span class="status-dot"></span>
+      <span class="status-name">AST Engine</span>
+      <span class="status-val">Active · CPU-bound</span>
+    </div>
+    <div class="status-item warn">
+      <span class="status-dot"></span>
+      <span class="status-name">Redis Queue</span>
+      <span class="status-val">Simulated (Demo Mode)</span>
+    </div>
+    <div class="status-item warn">
+      <span class="status-dot"></span>
+      <span class="status-name">Celery Worker</span>
+      <span class="status-val">Simulated (Demo Mode)</span>
+    </div>
+    <div class="status-item online">
+      <span class="status-dot"></span>
+      <span class="status-name">Linguistic Engine</span>
+      <span class="status-val">Active · Regex Pipeline</span>
+    </div>
+    <div class="status-item online">
+      <span class="status-dot"></span>
+      <span class="status-name">Database</span>
+      <span class="status-val">SQLite (Dev) · Atomic</span>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo"><span class="logo-bracket">[</span>SYNTIQ<span class="logo-bracket">]</span></div>
+    <div class="footer-copy">Analytics Dashboard &nbsp;·&nbsp; In-DB Aggregations &nbsp;·&nbsp; Single Row Response</div>
+    <div class="footer-nav"><a href="{% url 'index' %}" class="footer-link">← Back to Analyzer</a></div>
+  </div>
+</footer>
+
+<script>
+function refreshStats() {
+  fetch('/api/stats/').then(r => r.json()).then(d => {
+    document.getElementById('kpi-total').textContent = d.total_submissions;
+    document.getElementById('kpi-complexity').textContent = d.avg_complexity;
+    document.getElementById('kpi-chars').textContent = d.total_chars_modified;
+    document.getElementById('kpi-hazards').textContent = d.total_hazards_caught;
+    document.getElementById('kpi-fp').textContent = d.total_fingerprints;
+    // Animate KPI cards
+    document.querySelectorAll('.kpi-val').forEach(el => {
+      el.classList.add('kpi-flash');
+      setTimeout(() => el.classList.remove('kpi-flash'), 600);
+    });
+  });
+}
+setInterval(refreshStats, 8000);
+</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYNTIQ — Hybrid AST Analyzer & Linguistic Humanizer</title>
+{% load static %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/syntiq.css' %}">
+</head>
+<body>
+
+<!-- ═══ NOISE OVERLAY ═══ -->
+<div class="noise-overlay"></div>
+
+<!-- ═══ GRID BACKGROUND ═══ -->
+<div class="grid-bg"></div>
+
+<!-- ═══ SCAN LINE EFFECT ═══ -->
+<div class="scanline"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-text">SYNTIQ</span>
+      <span class="logo-bracket">]</span>
+      <span class="logo-tag">v2.4.1</span>
+    </div>
+    <div class="nav-links">
+      <a href="#analyzer" class="nav-link">AST Engine</a>
+      <a href="#humanizer" class="nav-link">Humanizer</a>
+      <a href="#pipeline" class="nav-link">Pipeline</a>
+      <a href="{% url 'dashboard' %}" class="nav-link nav-cta">Dashboard →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero">
+  <div class="hero-eyebrow">
+    <span class="pulse-dot"></span>
+    DUAL-PIPELINE ARCHITECTURE &nbsp;/&nbsp; REAL-TIME PROCESSING
+  </div>
+  <h1 class="hero-title">
+    <span class="title-line">SYNTIQ</span>
+    <span class="title-sub">Hybrid AST Analyzer<br>&amp; Linguistic Humanizer</span>
+  </h1>
+  <p class="hero-desc">
+    Split-path processing: structural code intelligence via recursive AST traversal
+    running parallel to AI fingerprint removal and linguistic burstiness optimization.
+  </p>
+  <div class="hero-badges">
+    <span class="badge">AST ∙ Python ast module</span>
+    <span class="badge">Celery ∙ Redis Queue</span>
+    <span class="badge">McCabe Complexity</span>
+    <span class="badge">Perplexity Engine</span>
+    <span class="badge">PostgreSQL Atomic</span>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat">
+      <span class="hstat-n" id="hs-total">{{ stats.total_submissions }}</span>
+      <span class="hstat-l">Submissions</span>
+    </div>
+    <div class="hstat-div">|</div>
+    <div class="hstat">
+      <span class="hstat-n" id="hs-chars">{{ stats.total_chars_modified }}</span>
+      <span class="hstat-l">Chars Cleaned</span>
+    </div>
+    <div class="hstat-div">|</div>
+    <div class="hstat">
+      <span class="hstat-n" id="hs-hazards">{{ stats.total_hazards_caught }}</span>
+      <span class="hstat-l">Hazards Caught</span>
+    </div>
+    <div class="hstat-div">|</div>
+    <div class="hstat">
+      <span class="hstat-n" id="hs-fp">{{ stats.total_fingerprints }}</span>
+      <span class="hstat-l">AI Prints Removed</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ PIPELINE DIAGRAM ═══ -->
+<section class="pipeline-section" id="pipeline">
+  <div class="section-label">// DUAL-PIPELINE ARCHITECTURE</div>
+  <div class="pipeline-flow">
+    <div class="pipe-node pipe-input">
+      <div class="pipe-icon">⬡</div>
+      <div class="pipe-name">INPUT</div>
+      <div class="pipe-desc">Code + Text Submission</div>
+    </div>
+    <div class="pipe-arrow">──▶</div>
+    <div class="pipe-split">
+      <div class="pipe-branch branch-top">
+        <div class="pipe-node pipe-ast">
+          <div class="pipe-icon">⟨/⟩</div>
+          <div class="pipe-name">AST PARSER</div>
+          <div class="pipe-desc">CPU · Instant · Local</div>
+        </div>
+        <div class="pipe-arrow-sm">▶</div>
+        <div class="pipe-node pipe-metric">
+          <div class="pipe-icon">◈</div>
+          <div class="pipe-name">COMPLEXITY</div>
+          <div class="pipe-desc">McCabe Score · Hazards</div>
+        </div>
+      </div>
+      <div class="pipe-branch branch-bottom">
+        <div class="pipe-node pipe-queue">
+          <div class="pipe-icon">⬢</div>
+          <div class="pipe-name">REDIS QUEUE</div>
+          <div class="pipe-desc">202 Accepted · Async</div>
+        </div>
+        <div class="pipe-arrow-sm">▶</div>
+        <div class="pipe-node pipe-llm">
+          <div class="pipe-icon">◉</div>
+          <div class="pipe-name">CELERY WORKER</div>
+          <div class="pipe-desc">LLM · Perplexity · Burst</div>
+        </div>
+      </div>
+    </div>
+    <div class="pipe-arrow">──▶</div>
+    <div class="pipe-node pipe-db">
+      <div class="pipe-icon">⬛</div>
+      <div class="pipe-name">PostgreSQL</div>
+      <div class="pipe-desc">Atomic · Aggregated</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MAIN WORKSPACE ═══ -->
+<main class="workspace" id="analyzer">
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="dual">Dual Pipeline</button>
+    <button class="tab" data-tab="code">AST Analyzer</button>
+    <button class="tab" data-tab="text">Linguistic Humanizer</button>
+  </div>
+
+  <!-- ── DUAL PANEL ── -->
+  <div class="panel active" id="tab-dual">
+    <div class="dual-grid">
+      <div class="input-col">
+        <div class="panel-header">
+          <span class="ph-track track-a">TRACK A</span>
+          <span class="ph-label">Python Source Code</span>
+          <button class="btn-load-sample" onclick="loadSample('code')">Load Sample</button>
+        </div>
+        <textarea id="dual-code" class="code-editor" placeholder="# Paste Python code here
+def process(data):
+    for i in range(10):
+        for j in range(10):
+            eval(data[i][j])"></textarea>
+      </div>
+      <div class="input-col">
+        <div class="panel-header">
+          <span class="ph-track track-b">TRACK B</span>
+          <span class="ph-label">Text to Humanize</span>
+          <button class="btn-load-sample" onclick="loadSample('text')">Load Sample</button>
+        </div>
+        <textarea id="dual-text" class="text-editor" placeholder="Paste AI-generated text here. Furthermore, it is worth noting that this tool will delve into removing AI fingerprints. In conclusion, the overall result demonstrates notable improvements."></textarea>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn-primary" id="btn-dual" onclick="runDual()">
+        <span class="btn-icon">⚡</span> Run Dual Pipeline
+      </button>
+      <div class="status-indicator" id="dual-status"></div>
+    </div>
+    <div id="dual-results" class="results-area hidden"></div>
+  </div>
+
+  <!-- ── AST PANEL ── -->
+  <div class="panel" id="tab-code">
+    <div class="panel-header">
+      <span class="ph-track track-a">AST ENGINE</span>
+      <span class="ph-label">Abstract Syntax Tree Analyzer</span>
+      <button class="btn-load-sample" onclick="loadSample('code-only')">Load Sample</button>
+    </div>
+    <textarea id="code-only" class="code-editor tall" placeholder="# Enter Python code for AST analysis"></textarea>
+    <div class="action-row">
+      <button class="btn-primary" onclick="runCode()">
+        <span class="btn-icon">⟨/⟩</span> Parse AST
+      </button>
+      <div class="status-indicator" id="code-status"></div>
+    </div>
+    <div id="code-results" class="results-area hidden"></div>
+  </div>
+
+  <!-- ── TEXT PANEL ── -->
+  <div class="panel" id="tab-text">
+    <div class="panel-header">
+      <span class="ph-track track-b">HUMANIZER</span>
+      <span class="ph-label">Linguistic Pre-Filter &amp; Token Sanitizer</span>
+      <button class="btn-load-sample" onclick="loadSample('text-only')">Load Sample</button>
+    </div>
+    <textarea id="text-only" class="text-editor tall" placeholder="Paste AI-generated text to humanize..."></textarea>
+    <div class="action-row">
+      <button class="btn-primary" onclick="runText()">
+        <span class="btn-icon">◉</span> Humanize Text
+      </button>
+      <div class="status-indicator" id="text-status"></div>
+    </div>
+    <div id="text-results" class="results-area hidden"></div>
+  </div>
+
+</main>
+
+<!-- ═══ ARCHITECTURE FEATURES ═══ -->
+<section class="features-section">
+  <div class="section-label">// SYSTEM ARCHITECTURE</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="fc-icon">⟨/⟩</div>
+      <div class="fc-title">AST Parsing</div>
+      <p class="fc-desc">Python's native <code>ast</code> module converts raw source into a structural tree graph. Recursive traversal computes nesting depth, counts branches, and flags dangerous nodes like <code>eval()</code>.</p>
+      <div class="fc-tag">ast.walk() · ast.NodeVisitor</div>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">◈</div>
+      <div class="fc-title">Cyclomatic Complexity</div>
+      <p class="fc-desc">McCabe complexity approximation counts all branch nodes — <code>If</code>, <code>For</code>, <code>While</code>, <code>ExceptHandler</code> — plus boolean operators. Produces an A–F grade scale.</p>
+      <div class="fc-tag">McCabe Score · Risk Index</div>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">⬢</div>
+      <div class="fc-title">Async Queue (Celery + Redis)</div>
+      <p class="fc-desc">LLM API calls are decoupled from the Django request cycle. Text jobs are pushed into Redis, returning <code>202 Accepted</code> instantly while Celery workers process in the background.</p>
+      <div class="fc-tag">Non-blocking · 202 Accepted</div>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">◉</div>
+      <div class="fc-title">Perplexity + Burstiness</div>
+      <p class="fc-desc">Pre-filters strip AI fingerprints via regex. Burstiness (coefficient of variation of sentence lengths) and perplexity (type-token ratio) are computed before and after transformation.</p>
+      <div class="fc-tag">Regex Pipeline · Linguistic Metrics</div>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">⬛</div>
+      <div class="fc-title">Atomic DB Transactions</div>
+      <p class="fc-desc">Every submission is wrapped in <code>transaction.atomic()</code>. If either analysis track fails mid-process, PostgreSQL rolls back — no partial, corrupted records survive.</p>
+      <div class="fc-tag">PostgreSQL · ACID Compliant</div>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">∑</div>
+      <div class="fc-title">SQL Aggregations</div>
+      <p class="fc-desc">Dashboard statistics use raw <code>AVG()</code>, <code>SUM()</code>, and string-difference aggregations computed inside the database — a single compiled row, not thousands fetched to Python.</p>
+      <div class="fc-tag">In-DB Compute · Single Row Response</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <span class="logo-bracket">[</span>SYNTIQ<span class="logo-bracket">]</span>
+    </div>
+    <div class="footer-copy">
+      Hybrid AST Analyzer &amp; Linguistic Humanizer &nbsp;·&nbsp; Dual-Pipeline Architecture
+      <br><span class="footer-stack">Django · Python · Celery · Redis · PostgreSQL · AST · NLP</span>
+    </div>
+    <div class="footer-nav">
+      <a href="{% url 'dashboard' %}" class="footer-link">Analytics Dashboard →</a>
+    </div>
+  </div>
+</footer>
+
+<script src="{% static 'js/syntiq.js' %}"></script>
+</body>
+</html>
